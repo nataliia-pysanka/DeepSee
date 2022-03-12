@@ -1,39 +1,41 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
   <title>Store</title>
 </head>
 <body>
 
-
-<div class="container">
-    <p>Products in store:</p>
-    <ul>
-    {% for product in products %}
-    <li>
-        <p>{{ product.name }}: {{ product.amount_in_stock }}</p>
-    </li>
-    {% endfor %}
-    </ul>
-</div>
-<div class="container">
-    <form method="POST" action="{% url 'product_list' %}">
-    {% csrf_token %}
-    {% for field in form %}
-      {{ field }}
-    {% endfor %}
-    <input type="submit" value="Update" id="update_btn">
-    <input type="submit" value="Buy" id="buy_btn">
-  </form>
+<div class="d-flex page-header">
+  <div class="mr-auto p-2">
+      <h1>Store</h1>
+  </div>
+  <div class="p-2">
+      <p><a href="{% url 'products' %}">api/products</a></p>
+      <p><a href="{% url 'create' %}">api/create</a></p>
+      <p><a href="{% url 'store' %}">api/store</a></p>
+  </div>
 </div>
 
-<!--<script src="{% static 'js/app.js' %}"></script>-->
-<!--<script src="{% static 'js/listen.js' %}"></script>-->
+<div class="content container">
+    <div class="d-flex">
+        <div class="p-2 flex-fill list">
+            <ul>
+            {% for product in products %}
+            <li>
+                <p>{{ product.name }}: {{ product.amount_in_stock }}</p>
+            </li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

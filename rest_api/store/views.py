@@ -1,38 +1,65 @@
 from django.shortcuts import render
 from .models import Product
-from django import forms
-import json
+
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+
+from .serializers import ProductSerializer, OrderProductSerializer
 
 
-class JSONForm(forms.Form):
-    JSON = forms.CharField(widget=forms.Textarea(attrs={'id': 'JSON'}))
+class ProductsListView(APIView):
+    """Displaying all products in the store on JSON"""
+    def get(self, request):
+        queryset = Product.objects.all()
+        if queryset:
+            serializer_for_queryset = ProductSerializer(
+                instance=queryset,
+                many=True
+            )
+            return Response(serializer_for_queryset.data,
+                            status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-def read_json(json_str):
-    data = json.loads(json_str)
-    for line in data:
+class CreateProductView(ProductsListView):
+    """Create a new product in the store"""
+    def post(self, request):
+        serializer = ProductSerializer(
+            data=request.data,
+            many=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
+
+
+class OrderProductView(ProductsListView):
+    """Order a product in the store"""
+    def put(self, request):
         try:
-            product = Product.objects.get(name=line['name'])
-            product.amount_in_stock += line['amount']
-            product.save()
+            product = Product.objects.get(name=request.data['name'])
         except Product.DoesNotExist:
-            product = Product()
-            product.name = line['name']
-            product.amount_in_stock = line['amount']
-            product.save()
-    return
+            return Response(status=status.HTTP_204_NO_CONTENT,
+                          data=f"Product {request.data['name']} doesn't exist")
+        if product:
+            serializer = OrderProductSerializer(instance=product,
+                                                data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(status=status.HTTP_201_CREATED)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 def product_list(request):
-    if request.method == "POST":
-        form = JSONForm(request.POST)
-        if form.is_valid():
-            json_str = f'{form.cleaned_data["JSON"]}'
-            read_json(json_str)
-            return render(request, 'store/product_list.html',
-                          {'products': Product.objects.all()})
-        else:
-            return render(request, 'store/product_list.html',
-                          {'products': Product.objects.all(), 'form': form})
-    return render(request, 'store/product_list.html',
-                  {'products': Product.objects.all(), 'form': JSONForm()})
+    """
+    Controller for displaying a list of all records on the main page.
+    :param request:
+    :return: render
+    """
+    products = Product.objects.all()
+    return render(request, 'store/product_list.html', {'products': products})
