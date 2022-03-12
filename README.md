@@ -8,7 +8,7 @@ ____
 
 ## How  to test application works:
 1. Clone repository: `git clone git@github.com:nataliia-pysanka/DeepSee.git`
-2. Change dir: `cd rest_api`
+2. Change dir: `cd DeepSee/rest_api`
 3. Install virtual enviroment: `python -m venv venv`
 4. Activate virtual env: `source venv/bin/activate`
 5. Update: `pip python -m pip install --upgrade pip`
