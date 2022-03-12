@@ -46,6 +46,9 @@ class OrderProductView(ProductsListView):
             return Response(status=status.HTTP_204_NO_CONTENT,
                           data=f"Product {request.data['name']} doesn't exist")
         if product:
+            if product.amount_in_stock < request.data['amount_in_stock']:
+                return Response(status=status.HTTP_400_BAD_REQUEST,
+                          data=f"Not enough amount")
             serializer = OrderProductSerializer(instance=product,
                                                 data=request.data)
             if serializer.is_valid(raise_exception=True):
