@@ -7,26 +7,23 @@ class ProductSerializer(serializers.Serializer):
     amount_in_stock = serializers.IntegerField()
 
     def create(self, validated_data):
-        return Product.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        print(self)
-        instance.name = validated_data.get('name', instance.name)
-        instance.amount_in_stock += validated_data.get('amount_in_stock',
-                                                      instance.amount_in_stock)
-        instance.save()
+        instance, created = Product.objects.update_or_create(
+            name=validated_data.get('name', None),
+            defaults=validated_data)
+        if not created:
+            amount = validated_data.get('amount_in_stock',
+                                        instance.amount_in_stock)
+            instance.amount_in_stock += amount
+            instance.save()
         return instance
 
 
 class OrderProductSerializer(ProductSerializer):
     def update(self, instance, validated_data):
-        print(self)
-        instance.name = validated_data.get('name', instance.name)
+        # instance.name = Product.objects.get('name', instance.name)
         amount = validated_data.get('amount_in_stock',
                                     instance.amount_in_stock)
-        if instance.amount_in_stock > amount:
-            instance.amount_in_stock -= amount
-        else:
-            instance.amount_in_stock = 0
+        instance.amount_in_stock -= amount
         instance.save()
         return instance
+
