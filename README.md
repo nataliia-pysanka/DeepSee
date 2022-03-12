@@ -11,9 +11,9 @@ ____
 2. Change dir: `cd DeepSee/rest_api`
 3. Install virtual enviroment: `python -m venv venv`
 4. Activate virtual env: `source venv/bin/activate`
-5. Update: `pip python -m pip install --upgrade pip`
+5. Update: `pip install --upgrade pip`
 6. Install dependencies for the project in the virtual environment python:
-   `-m pip install --no-cache-dir -r requirements.txt`
+   `python -m pip install --no-cache-dir -r requirements.txt`
 7. Make migrations for creating DB:
    `python manage.py makemigrations && python manage.py migrate`
 8. Launch local server: `python manage.py runserver`
